@@ -1,0 +1,51 @@
+1ere Etape:
+	- Se connecter sur SSH:
+		ssh root@38.242.224.248
+
+	- Creer un utilisateur
+		1. adduser user1
+		2. Add User to Sudoers File or Sudo Group sudo usermod -aG sudo user1
+		3. Add the new user to the list of allowed users in the /etc/ssh/sshd_config file on your instance, by editing the AllowUsers parameter, as shown in the following example:
+		AllowUsers myadmin ...
+		4. service sshd restart
+
+2. se connecter comme user1
+	ìnstaller apache
+		- sudo apt install apache2
+		- LoadModule proxy_module /usr/lib/apache2/modules/mod_proxy.so
+			LoadModule proxy_http_module /usr/lib/apache2/modules/mod_proxy_http.so
+			LoadModule rewrite_module /usr/lib/apache2/modules/mod_rewrite.so
+
+			<VirtualHost *:80>
+			  ProxyPreserveHost On
+			  ProxyRequests Off
+
+			  ProxyPass /phpmyadmin !
+			  ProxyPass /phpmyadmin http://127.0.0.1:80/phpmyadmin
+			  ProxyPassReverse /phpmyadmin http://127.0.0.1:80/phpmyadmin
+
+			  ProxyRequests Off
+			  <Proxy *>
+			    Order deny,allow
+			    Allow from all
+			  </Proxy>
+
+			  ProxyPass / http://127.0.0.1:8000/
+			  ProxyPassReverse / http://127.0.0.1:8000/
+
+			  ProxyPreserveHost On
+
+			</VirtualHost>
+		- service apache2 restart
+
+
+========================
+cd /var/www/
+git ....
+pip......
+=============
+screen
+runserver
+ctrl+a+d <=> screen -r -d uuid
+
+kuriha-birashoboka.
