@@ -1,4 +1,4 @@
-KEY = "scp-live-55facd3dd42d46fc9c77618cb7bb8eb9"
+KEY = "YOUR-KEY-HERE"
 
 from scrapfly import ScrapeConfig, ScrapflyClient, ScrapeApiResponse
 from typing import Dict, List
