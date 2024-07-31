@@ -13,25 +13,7 @@ def set_proxy(proxy_address):
 with open("valid_proxies.txt", "r") as f:
     proxies = f.read().split("\n")
 
-def analyse_site():
-
-    # Récupérer l'URL du site à analyser depuis la requête
-    url = sys.argv[1]
-
-    # Initialiser le navigateur Chrome avec les options configurées
-    proxy = "198.49.68.80:80" #random.choice(proxies)
-
-    # Configuration de Selenium 
-    driver = set_proxy(proxy)
-
-    driver.get(url=url)
-
-    # Récupérer le contenu généré par JavaScript
-    html_content = driver.page_source
-
-    # Fermer le navigateur
-    driver.quit()
-
+def analyse_site(html_content):
 
     # Utiliser BeautifulSoup pour parser le code HTML
     soup = BeautifulSoup(html_content, 'html.parser')
