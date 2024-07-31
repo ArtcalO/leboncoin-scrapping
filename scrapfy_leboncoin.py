@@ -8,21 +8,16 @@ import sys
 import requests
 
 
-def post_data(data):
-    url = "https://api.example.com/users"
+def post_data(incoming_data):
+    url = "https://ibisokozo.ksquad.dev/rest_api/leboncoin-scrapped-items/"
     headers = {'Content-Type': 'application/json'}
-    data = {
-      "name": "John Doe",
-      "email": "johndoe@example.com",
-      "password": "password123"
-    }
-
+    data = incoming_data
     response = requests.post(url, headers=headers, json=data)
 
     if response.status_code == 201:
-      print("User created successfully")
+      print("Data posted")
     else:
-      print("Error creating user:", response.text)
+      print("Error while posting data", response.text)
 
 def get_object_by_value(data, key, value):
     for item in data:
@@ -32,24 +27,17 @@ def get_object_by_value(data, key, value):
 
 SCRAPFLY = ScrapflyClient(key=KEY)
 
-# scrapfly config
 BASE_CONFIG = {
-    # bypass web scraping blocking
     "asp": True,
-    # set the proxy location to France
     "country": "fr",
 }
 
 def parse_search(result: ScrapeApiResponse):
-    """parse search result data from nextjs cache"""
-    # select the __NEXT_DATA__ script from the HTML
     next_data = result.selector.css("script[id='__NEXT_DATA__']::text").get()
-    # extract ads listing data from the search page
     ads_data = json.loads(next_data)
     return ads_data['props']['pageProps']['ad']
 
 async def scrape_search(url: str, max_pages: int) -> List[Dict]:
-    """scrape leboncoin search"""
     print(f"scraping search {url}")
     first_page = await SCRAPFLY.async_scrape(ScrapeConfig(url, **BASE_CONFIG))
     search_data = parse_search(first_page)
@@ -66,9 +54,17 @@ async def scrape_search(url: str, max_pages: int) -> List[Dict]:
     
     return response
 
-# run the scraping function
+
+import time
 
 if __name__ == "__main__":
-    url = sys.arg[1]
+    start_time = time.time()
+
+    url = sys.argv[1]
     response = asyncio.run(scrape_search(url=url, max_pages=1))
+    post_data(response)
+
+    end_time = time.time()
+    elapsed_time = end_time - start_time
+    print("Elapsed time:", elapsed_time, "seconds")
 
