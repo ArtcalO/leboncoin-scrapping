@@ -1,3 +1,11 @@
+"""
+Author: Carmel NIYUNGEKO [ArtcalO TLW]
+Github: https//:github.com/ArtcalO
+Email: niyca14@gmail.com, artcalo@ksquad.dev
+Date: 2024-07-31
+Description: This script does webscrapping of lebon coin
+
+"""
 KEY = "YOUR-KEY-HERE"
 
 from scrapfly import ScrapeConfig, ScrapflyClient, ScrapeApiResponse
