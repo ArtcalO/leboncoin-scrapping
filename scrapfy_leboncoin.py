@@ -6,7 +6,10 @@ Date: 2024-07-31
 Description: This script does webscrapping of lebon coin
 
 """
-KEY = "YOUR-KEY-HERE"
+#
+
+#KEY = "YOUR-KEY-HERE"
+
 
 from scrapfly import ScrapeConfig, ScrapflyClient, ScrapeApiResponse
 from typing import Dict, List
@@ -14,10 +17,11 @@ import asyncio
 import json
 import sys
 import requests
+import time
 
 
 def post_data(incoming_data):
-    url = "https://ibisokozo.ksquad.dev/rest_api/leboncoin-scrapped-items/"
+    url = "https://scrapping.fenfly.co.bi/rest_api/scrapped-items/"
     headers = {'Content-Type': 'application/json'}
     data = incoming_data
     response = requests.post(url, headers=headers, json=data)
@@ -43,6 +47,8 @@ BASE_CONFIG = {
 def parse_search(result: ScrapeApiResponse):
     next_data = result.selector.css("script[id='__NEXT_DATA__']::text").get()
     ads_data = json.loads(next_data)
+    while not "ad" in ads_data['props']['pageProps']:
+        time.sleep(1)
     return ads_data['props']['pageProps']['ad']
 
 async def scrape_search(url: str, max_pages: int) -> List[Dict]:
@@ -56,7 +62,11 @@ async def scrape_search(url: str, max_pages: int) -> List[Dict]:
         'type_habitat':get_object_by_value(search_data["attributes"],"key","real_estate_type")['value_label'],
         'surface_habitable':get_object_by_value(search_data["attributes"],"key","square")['value_label'],
         'nbr_pieces':get_object_by_value(search_data["attributes"],"key","rooms")['value_label'],
-        'description': search_data["body"]
+        'dpe':get_object_by_value(search_data["attributes"],"key","energy_rate")['value_label'],
+        'ges':get_object_by_value(search_data["attributes"],"key","ges")['value_label'],
+        'description': search_data["body"],
+        'images':{"urls":search_data['images']['urls']},
+        "html_content":first_page.content
         
     }
     
