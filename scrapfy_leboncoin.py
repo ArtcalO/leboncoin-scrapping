@@ -8,8 +8,7 @@ Description: This script does webscrapping of lebon coin
 """
 #
 
-#KEY = "YOUR-KEY-HERE"
-
+KEY = "YOUR-KEY-HERE"
 
 from scrapfly import ScrapeConfig, ScrapflyClient, ScrapeApiResponse
 from typing import Dict, List
@@ -18,13 +17,25 @@ import json
 import sys
 import requests
 import time
+import datetime
+
+def fetch_image(url):
+    response = requests.get(url)
+    if response.status_code == 200:
+        return response.content
+    else:
+        return None
 
 
 def post_data(incoming_data):
     url = "https://scrapping.fenfly.co.bi/rest_api/scrapped-items/"
-    headers = {'Content-Type': 'application/json'}
+    #url = "http://127.0.0.1:8000/rest_api/scrapped-items/"
+    headers = None #{'Content-Type': 'application/json'}
     data = incoming_data
-    response = requests.post(url, headers=headers, json=data)
+    timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+    filename = f"image_{timestamp}.jpeg"
+    files = {'file': (filename, incoming_data['image_1'], 'image/jpeg')}
+    response = requests.post(url, files=files,data=data,headers=headers)
 
     if response.status_code == 201:
       print("Data posted")
@@ -61,11 +72,13 @@ async def scrape_search(url: str, max_pages: int) -> List[Dict]:
         'prix':search_data["price_cents"]/100,
         'type_habitat':get_object_by_value(search_data["attributes"],"key","real_estate_type")['value_label'],
         'surface_habitable':get_object_by_value(search_data["attributes"],"key","square")['value_label'],
+        'surface_terrain':get_object_by_value(search_data["attributes"],"key","land_plot_surface")['value_label'],
         'nbr_pieces':get_object_by_value(search_data["attributes"],"key","rooms")['value_label'],
         'dpe':get_object_by_value(search_data["attributes"],"key","energy_rate")['value_label'],
         'ges':get_object_by_value(search_data["attributes"],"key","ges")['value_label'],
         'description': search_data["body"],
         'images':{"urls":search_data['images']['urls']},
+        'image_1':fetch_image(search_data['images']['urls'][0]),
         "html_content":first_page.content
         
     }
